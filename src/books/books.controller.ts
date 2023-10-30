@@ -1,11 +1,32 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { BooksService } from './books.service';
+import { Book } from './entities/Book';
 
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
+
   @Get()
-  getBooks(): any[] {
+  getBooks(): Book[] {
     return this.booksService.getBooks();
+  }
+
+  @Get(':id')
+  getBook(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => new BadRequestException('Не число!'),
+      }),
+    )
+    id: number,
+  ): Book {
+    return this.booksService.getBook(id);
   }
 }
